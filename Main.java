@@ -95,6 +95,12 @@ String folderAddress = "frames/build/"; // Address of folder where frames are sa
 String fileName = "frames-";   // Name of PNG file
 int digits = 4;                // Digits to add after the name
 
+//MISALIGNMENT
+String mode = "alignment";
+boolean vertical = true;
+boolean horizontal = true;
+String angles = "cos";
+
 // END OF CUSTOMIZABLE
 
 Canvas canvas;
@@ -108,7 +114,7 @@ int lowestAge = 0;
 void spawn() {
   // Spawn new agents
   for (int i = 0; i < numAgents; i++) {
-    agents.add(new Agent(canvas, randomSpawn, i, numAgents, collisionCenterDir, spawnCenterDir, correctAngle, speed, acc, agentSize, spawn, detail, radius, palette, contour, colorChange));
+    agents.add(new Agent(canvas, mode, randomSpawn, i, numAgents, collisionCenterDir, spawnCenterDir, correctAngle, speed, acc, agentSize, spawn, detail, radius, palette, contour, colorChange, vertical, horizontal, angles));
   }
   age++; // Increase age
 }
