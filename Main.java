@@ -98,8 +98,9 @@ int digits = 4;                // Digits to add after the name
 //MISALIGNMENT
 String mode = "alignment";
 boolean vertical = true;
-boolean horizontal = true;
-String angles = "cos";
+boolean horizontal = false;
+String angles = "sin";
+float scalor =2.5;
 
 // END OF CUSTOMIZABLE
 
@@ -114,7 +115,7 @@ int lowestAge = 0;
 void spawn() {
   // Spawn new agents
   for (int i = 0; i < numAgents; i++) {
-    agents.add(new Agent(canvas, mode, randomSpawn, i, numAgents, collisionCenterDir, spawnCenterDir, correctAngle, speed, acc, agentSize, spawn, detail, radius, palette, contour, colorChange, vertical, horizontal, angles));
+    agents.add(new Agent(canvas, mode, randomSpawn, i, numAgents, collisionCenterDir, spawnCenterDir, correctAngle, speed, acc, agentSize, spawn, detail, radius, palette, contour, colorChange, vertical, horizontal, angles, scalor));
   }
   age++; // Increase age
 }

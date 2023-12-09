@@ -8,8 +8,8 @@ class Agent {
   String mode;
 
   boolean randomSpawn;
-  int num;
-  int total;
+  float num;
+  float total;
 
   boolean collisionCenterDir;
   boolean spawnCenterDir;
@@ -33,12 +33,12 @@ class Agent {
   boolean bounced;
 
   //ALIGMENT
-  float scalor = 1.75;
   boolean vertical;
   boolean horizontal;
   String angles;
+  float scalor;
 
-  Agent(Canvas canvas, String mode, boolean randomSpawn, int num, int total, boolean collisionCenterDir, boolean spawnCenterDir, boolean correctAngle, float speed, float acc, float size, String spawn, String detail, int radius, color[] palette, color contour, String colorChange, boolean vertical, boolean horizontal, String angles) {
+  Agent(Canvas canvas, String mode, boolean randomSpawn, float num, float total, boolean collisionCenterDir, boolean spawnCenterDir, boolean correctAngle, float speed, float acc, float size, String spawn, String detail, int radius, color[] palette, color contour, String colorChange, boolean vertical, boolean horizontal, String angles, float scalor) {
     this.canvas = canvas;
     this.mode = mode;
 
@@ -65,6 +65,7 @@ class Agent {
     this.vertical = vertical;
     this.horizontal = horizontal;
     this.angles = angles;
+    this.scalor = scalor;
 
     if (mode == "entropy") {
       if (randomSpawn) {
@@ -83,7 +84,7 @@ class Agent {
 
         int i = int(random(4));
         if (!randomSpawn) {
-          i = num%4;
+          i = int(num)%4;
         } /*else {
          num = (num - num%4)/4;
          total = total/4;
@@ -140,7 +141,7 @@ class Agent {
         };
         int i = int(random(4));
         if (!randomSpawn) {
-          i = num%4;
+          i = int(num)%4;
         }
         this.pos = edges[i];
 
@@ -220,7 +221,6 @@ class Agent {
       int[] vertBounds = {pad, height-pad};
       int[] horiBounds = {pad, width-pad};
 
-
       if (vertical && horizontal) {
         if (random(1)>0.5) {
           vertical = false;
@@ -230,37 +230,66 @@ class Agent {
       }
       float[] possibleAngles = {0, PI};
       if (vertical) {
-        this.pos = new PVector(width/2, random(vertBounds[0], vertBounds[1]));
+        if (randomSpawn) {
+          this.pos = new PVector(width/2, random(vertBounds[0], vertBounds[1]));
+        } else {
+          this.pos = new PVector(width/2, vertBounds[0] + (num/total)*(vertBounds[1] - vertBounds[0]));
+        }
       }
       if (horizontal) {
-        this.pos = new PVector(random(horiBounds[0], horiBounds[1]), height/2);
+        if (randomSpawn) {
+          this.pos = new PVector(random(horiBounds[0], horiBounds[1]), height/2);
+        } else {
+          this.pos = new PVector(horiBounds[0] + (num/total) * (horiBounds[1]-horiBounds[0]), height/2);
+        }
         possibleAngles = new float[]{PI/2, 3*PI/2};
       }
-      if (random(1)>0.5) {
+      boolean direction = random(1)>0.5;
+      if (!randomSpawn) {
+        direction = num%2 ==0;
+      }
+      boolean direction2 = random(1)>0.5;
+      if (!randomSpawn) {
+        if (direction) {
+          direction2 = num%4==0;
+        } else {
+          direction2 = (num-1)%4==0;
+        }
+      }
+      if (direction) {
         this.angle = possibleAngles[0];
       } else {
         this.angle = possibleAngles[1];
       }
+      float dist = sqrt(pow(pos.x - width/2, 2) + pow(pos.y - height/2, 2));
+
       if (angles == "sin") {
-        float dist = sqrt(pow(pos.x - width/2, 2) + pow(pos.y - height/2, 2));
-        if (random(1)>0.5) {
+        if (direction2) {
           this.angle -= (sin(scalor*dist/width)) * TAU;
         } else {
           this.angle += (sin(scalor*dist/width)) * TAU;
         }
       } else if (angles == "cos") {
-        float dist = sqrt(pow(pos.x - width/2, 2) + pow(pos.y - height/2, 2));
-        if (random(1)>0.5) {
+        if (direction2) {
           this.angle -= (cos(scalor*dist/width)) * TAU;
         } else {
           this.angle += (cos(scalor*dist/width)) * TAU;
         }
       } else if (angles == "log") {
-        float dist = sqrt(pow(pos.x - width/2, 2) + pow(pos.y - height/2, 2));
-        this.angle += (log(dist))/(scalor);
+        if (direction2) {
+          this.angle += (log(dist))/(scalor);
+        } else {
+          this.angle-= (log(dist))/(scalor);
+        }
       } else if (angles == "exp") {
-        float dist = sqrt(pow(pos.x - width/2, 2) + pow(pos.y - height/2, 2));
-        this.angle += pow(dist/TAU, 2)/(2*width/TAU);
+        if (direction2) {
+          //this.angle += pow(dist/scalor, 2)/(canvas.maxDistance);
+          this.angle += pow(dist, 2)/(pow(scalor,5)*canvas.maxDistance);
+
+        } else {
+          //this.angle -= pow(dist/scalor, 2)/(canvas.maxDistance);
+          this.angle -= pow(dist, 2)/(pow(scalor,5)*canvas.maxDistance);
+        }
       } else {
         this.angle += random(1) * PI;
       }
